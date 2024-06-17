@@ -46,11 +46,11 @@ public class ImplementacionTraductor extends UnicastRemoteObject implements Inte
     @Override
     public synchronized void clearData() throws RemoteException {
         dataList.clear();
-        combinedData = new char[0]; // Limpiar el array combinado
+        combinedData = new char[0];
     }
 
     @Override
     public synchronized void clearCombinedArrays() throws RemoteException {
-        combinedData = new char[0]; // Limpiar el array combinado
+        combinedData = new char[0];
     }
 }
