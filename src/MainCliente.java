@@ -220,8 +220,7 @@ public class MainCliente extends JFrame implements ActionListener {
                 generator = (InterfazTraductor) Naming.lookup(url);
                 String inputText = texto_Ingresado.getText();
                 generator.addArray(inputText.toCharArray());
-                char[] combinedArray = generator.combineArrays();
-                this.combinedArray = combinedArray;
+                actualizarTextos();
                 JOptionPane.showMessageDialog(this, "Texto enviado y combinado recibido del servidor.");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -256,18 +255,38 @@ public class MainCliente extends JFrame implements ActionListener {
         }
     }
 
+    // Método para actualizar los textos de resultados en la interfaz gráfica
+    private void actualizarTextos() {
+        try {
+            char[] combinedArray = generator.combineArrays();
+            String morseResult = convertToMorse(combinedArray);
+            texto_ResultadoMergAreae.setText(morseResult);
+            texto_ResultadoFork.setText(morseResult);
+            texto_ResultadoExecutor.setText(morseResult);
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al obtener el texto combinado del servidor: " + ex.getMessage());
+        }
+    }
+
     private void handleExecutor() {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         long startTime = System.nanoTime();
 
         executorService.submit(() -> {
-            String morseResult = LogicaExecutorService.traducirTextoConExecutorService(combinedArray, CodigoMorse);
-            SwingUtilities.invokeLater(() -> {
-                texto_ResultadoExecutor.setText(morseResult);
-                double executionTimeInMillis = (System.nanoTime() - startTime) / 1_000_000.0;
-                TiempoExecutorField.setText(String.format("%.2f ms", executionTimeInMillis));
-            });
+            try {
+                char[] combinedArray = generator.combineArrays();
+                String morseResult = LogicaExecutorService.traducirTextoConExecutorService(combinedArray, CodigoMorse);
+                SwingUtilities.invokeLater(() -> {
+                    texto_ResultadoExecutor.setText(morseResult);
+                    double executionTimeInMillis = (System.nanoTime() - startTime) / 1_000_000.0;
+                    TiempoExecutorField.setText(String.format("%.2f ms", executionTimeInMillis));
+                });
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al obtener el texto combinado del servidor: " + e.getMessage());
+            }
         });
 
         executorService.shutdown();
@@ -276,14 +295,20 @@ public class MainCliente extends JFrame implements ActionListener {
     private void handleMerge() {
         long startTime = System.nanoTime();
         LogicaMergeSort logicaMergeSort = new LogicaMergeSort();
-        logicaMergeSort.mergeSort(combinedArray, 0, combinedArray.length - 1);
-        long endTime = System.nanoTime();
+        try {
+            char[] combinedArray = generator.combineArrays();
+            logicaMergeSort.mergeSort(combinedArray, 0, combinedArray.length - 1);
+            long endTime = System.nanoTime();
 
-        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
-        TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
+            double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+            TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
 
-        String morseResult = convertToMorse(combinedArray);
-        texto_ResultadoMergAreae.setText(morseResult);
+            String morseResult = convertToMorse(combinedArray);
+            texto_ResultadoMergAreae.setText(morseResult);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al obtener el texto combinado del servidor: " + e.getMessage());
+        }
     }
 
     private void handleForkJoin() {
