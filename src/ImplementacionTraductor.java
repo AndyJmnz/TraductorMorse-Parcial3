@@ -3,20 +3,22 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class ImplementacionTraductor extends UnicastRemoteObject implements InterfazTraductor {
     private List<char[]> dataList;
     private int clientCount;
     private int totalClients;
-
+    private char[] combinedData;
 
     protected ImplementacionTraductor(int totalClients) throws RemoteException {
         dataList = new ArrayList<>();
         this.totalClients = totalClients;
         clientCount = 0;
+        combinedData = new char[0]; // Inicializar el array combinado vacío
     }
 
     @Override
-    public void addArray(char[] data) throws RemoteException {
+    public synchronized void addArray(char[] data) throws RemoteException {
         dataList.add(data);
         clientCount++;
         if (clientCount == totalClients) {
@@ -24,39 +26,31 @@ public class ImplementacionTraductor extends UnicastRemoteObject implements Inte
             combineData();
         }
     }
+
     private void combineData() {
         int totalLength = dataList.stream().mapToInt(arr -> arr.length).sum();
-        char[] combinedArray = new char[totalLength];
+        combinedData = new char[totalLength];
         int index = 0;
         for (char[] array : dataList) {
-            System.arraycopy(array, 0, combinedArray, index, array.length);
+            System.arraycopy(array, 0, combinedData, index, array.length);
             index += array.length;
         }
         dataList.clear();
-        dataList.add(combinedArray);
     }
 
     @Override
-    public char[] combineArrays() throws RemoteException {
-        if (dataList.isEmpty()) return new char[0];
-        int totalLength = dataList.stream().mapToInt(arr -> arr.length).sum();
-        char[] combinedArray = new char[totalLength];
-        int index = 0;
-        for (char[] array : dataList) {
-            System.arraycopy(array, 0, combinedArray, index, array.length);
-            index += array.length;
-        }
-        return combinedArray;
+    public synchronized char[] combineArrays() throws RemoteException {
+        return combinedData;
     }
 
     @Override
-    public void clearData() throws RemoteException {
+    public synchronized void clearData() throws RemoteException {
         dataList.clear();
+        combinedData = new char[0]; // Limpiar el array combinado
     }
 
     @Override
-    public void clearCombinedArrays() throws RemoteException {
-        dataList.clear();
+    public synchronized void clearCombinedArrays() throws RemoteException {
+        combinedData = new char[0]; // Limpiar el array combinado
     }
-
 }

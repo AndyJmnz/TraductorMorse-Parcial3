@@ -2,11 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,18 +11,16 @@ import java.util.concurrent.ForkJoinPool;
 
 public class MainCliente extends JFrame implements ActionListener {
 
-    JLabel ingresarJLabel, resultado1JLabel, resultado2JLabel,resultado3JLabel,tiempo1JLabel, tiempo2JLabel, tiempo3JLabel;
+    JLabel ingresarJLabel, resultado1JLabel, resultado2JLabel, resultado3JLabel, tiempo1JLabel, tiempo2JLabel, tiempo3JLabel;
     JTextArea texto_Ingresado, texto_ResultadoMergAreae, texto_ResultadoFork, texto_ResultadoExecutor;
-    JTextField  TiempoMergeField, TiempoForkField, TiempoExecutorField;
-    JButton JbuttonMerge, JbuttonForkJoin, JbuttonExecutor, JbuttonLimpiarButton,limpiarButton, combinarButton;
+    JTextField TiempoMergeField, TiempoForkField, TiempoExecutorField;
+    JButton JbuttonMerge, JbuttonForkJoin, JbuttonExecutor, limpiarButton, combinarButton;
     private static final HashMap<Character, String> CodigoMorse = new HashMap<>();
 
-
     char[] combinedArray;
-    private char[] generatedArray;// Store the combined array
     InterfazTraductor generator = null;
     int puerto = 1099;
-    String url = "//192.168.0.28:" + puerto + "/TraductorMorse";
+    String url = "//192.168.0.2:" + puerto + "/TraductorMorse";
 
     static {
         CodigoMorse.put('a', ".-");
@@ -211,122 +206,110 @@ public class MainCliente extends JFrame implements ActionListener {
 
         combinarButton.setBackground(new Color(249, 65, 68));
         combinarButton.setForeground(Color.WHITE);
-
-        try {
-            generator = (InterfazTraductor) Naming.lookup(url);
-        } catch (NotBoundException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-        setVisible(true);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MainCliente::new);
-
-    } private void sendData(char[] data) {
-        try {
-            generator.addArray(data);
-            //JOptionPane.showMessageDialog(this, "Datos enviados al servidor.", "Información", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al enviar datos al servidor.", "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
+        MainCliente cliente = new MainCliente();
+        cliente.setVisible(true);
     }
-
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == combinarButton) {
-            sendData(generatedArray);
             try {
-                combinedArray = generator.combineArrays();
-            } catch (RemoteException ex) {
-                throw new RuntimeException(ex);
+                generator = (InterfazTraductor) Naming.lookup(url);
+                String inputText = texto_Ingresado.getText();
+                generator.addArray(inputText.toCharArray());
+                char[] combinedArray = generator.combineArrays();
+                this.combinedArray = combinedArray;
+                JOptionPane.showMessageDialog(this, "Texto enviado y combinado recibido del servidor.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al enviar texto al servidor: " + ex.getMessage());
             }
-        } else if (e.getSource() == JbuttonMerge) {
-            String inputText = texto_Ingresado.getText().toLowerCase();
-            char[] charArray = inputText.toCharArray();
-
-            long startTime = System.nanoTime();
-            LogicaMergeSort logicaMergeSort = new LogicaMergeSort();
-            logicaMergeSort.mergeSort(charArray, 0, charArray.length - 1);
-            logicaMergeSort.justChecking(charArray);
-            long endTime = System.nanoTime();
-
-            double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
-            TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
-
-            StringBuilder morseCode = new StringBuilder();
-            for (char c : charArray) {
-                if (CodigoMorse.containsKey(c)) {
-                    morseCode.append(CodigoMorse.get(c)).append(" ");
-                } else {
-                    morseCode.append(" ");
-                }
-            }
-            texto_ResultadoMergAreae.setText(morseCode.toString());
-
-        } else if (e.getSource() == JbuttonForkJoin) {
-            String inputText = texto_Ingresado.getText().toLowerCase();
-            char[] charArray = inputText.toCharArray();
-
-            ForkJoinPool forkJoinPool = new ForkJoinPool();
-            LogicaForkJoin mergeSortTask = new LogicaForkJoin(charArray, 0, charArray.length - 1);
-
-            long startTime = System.nanoTime();
-            forkJoinPool.invoke(mergeSortTask);
-            long endTime = System.nanoTime();
-
-            double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
-            TiempoForkField.setText(String.format("%.2f ms", executionTimeInMillis));
-
-            StringBuilder morseCode = new StringBuilder();
-            for (char c : charArray) {
-                if (CodigoMorse.containsKey(c)) {
-                    morseCode.append(CodigoMorse.get(c)).append(" ");
-                } else if (c == ' ') {
-                    morseCode.append(" ");
-                }
-            }
-
-            texto_ResultadoFork.setText(morseCode.toString());
-        } else if (e.getSource() == JbuttonExecutor) {
-            String inputText = texto_Ingresado.getText();
-            char[] charArray = inputText.toLowerCase().toCharArray();
-
-            ExecutorService executorService = Executors.newFixedThreadPool(4);
-
-            long startTime = System.nanoTime();
-
-            executorService.submit(() -> {
-                String morseResult = LogicaExecutorService.traducirTextoConExecutorService(charArray, CodigoMorse);
-                long endTime = System.nanoTime();
-
-                SwingUtilities.invokeLater(() -> {
-                    texto_ResultadoExecutor.setText(morseResult);
-                    double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
-                    TiempoExecutorField.setText(String.format("%.2f ms", executionTimeInMillis));
-                });
-            });
-
-            executorService.shutdown();
         } else if (e.getSource() == limpiarButton) {
-            limpiarCampos();
+            texto_Ingresado.setText("");
+            texto_ResultadoMergAreae.setText("");
+            texto_ResultadoFork.setText("");
+            texto_ResultadoExecutor.setText("");
+            TiempoMergeField.setText("");
+            TiempoForkField.setText("");
+            TiempoExecutorField.setText("");
+        } else if (e.getSource() == JbuttonMerge) {
+            if (combinedArray != null) {
+                handleMerge();
+            } else {
+                JOptionPane.showMessageDialog(this, "Por favor, combine texto primero.");
+            }
+        } else if (e.getSource() == JbuttonForkJoin) {
+            if (combinedArray != null) {
+                handleForkJoin();
+            } else {
+                JOptionPane.showMessageDialog(this, "Por favor, combine texto primero.");
+            }
+        } else if (e.getSource() == JbuttonExecutor) {
+            if (combinedArray != null) {
+                handleExecutor();
+            } else {
+                JOptionPane.showMessageDialog(this, "Por favor, combine texto primero.");
+            }
         }
     }
 
-    private void limpiarCampos() {
-        texto_Ingresado.setText("");
-        texto_ResultadoMergAreae.setText("");
-        texto_ResultadoFork.setText("");
-        texto_ResultadoExecutor.setText("");
-        TiempoMergeField.setText("");
-        TiempoForkField.setText("");
-        TiempoExecutorField.setText("");
+    private void handleExecutor() {
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        long startTime = System.nanoTime();
+
+        executorService.submit(() -> {
+            String morseResult = LogicaExecutorService.traducirTextoConExecutorService(combinedArray, CodigoMorse);
+            SwingUtilities.invokeLater(() -> {
+                texto_ResultadoExecutor.setText(morseResult);
+                double executionTimeInMillis = (System.nanoTime() - startTime) / 1_000_000.0;
+                TiempoExecutorField.setText(String.format("%.2f ms", executionTimeInMillis));
+            });
+        });
+
+        executorService.shutdown();
+    }
+
+    private void handleMerge() {
+        long startTime = System.nanoTime();
+        LogicaMergeSort logicaMergeSort = new LogicaMergeSort();
+        logicaMergeSort.mergeSort(combinedArray, 0, combinedArray.length - 1);
+        long endTime = System.nanoTime();
+
+        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+        TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
+
+        String morseResult = convertToMorse(combinedArray);
+        texto_ResultadoMergAreae.setText(morseResult);
+    }
+
+    private void handleForkJoin() {
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        LogicaForkJoin mergeSortTask = new LogicaForkJoin(combinedArray, 0, combinedArray.length - 1);
+
+        long startTime = System.nanoTime();
+        forkJoinPool.invoke(mergeSortTask);
+        long endTime = System.nanoTime();
+
+        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+        TiempoForkField.setText(String.format("%.2f ms", executionTimeInMillis));
+
+        String morseResult = convertToMorse(combinedArray);
+        texto_ResultadoFork.setText(morseResult);
+    }
+
+    private String convertToMorse(char[] charArray) {
+        StringBuilder morseCode = new StringBuilder();
+        for (char c : charArray) {
+            if (CodigoMorse.containsKey(c)) {
+                morseCode.append(CodigoMorse.get(c)).append(" ");
+            } else {
+                morseCode.append(" ");
+            }
+        }
+        return morseCode.toString();
     }
 }
-
