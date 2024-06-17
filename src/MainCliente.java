@@ -220,7 +220,7 @@ public class MainCliente extends JFrame implements ActionListener {
                 generator = (InterfazTraductor) Naming.lookup(url);
                 String inputText = texto_Ingresado.getText();
                 generator.addArray(inputText.toCharArray());
-                actualizarTextos();
+                //actualizarTextos();
                 JOptionPane.showMessageDialog(this, "Texto enviado y combinado recibido del servidor.");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -256,7 +256,7 @@ public class MainCliente extends JFrame implements ActionListener {
     }
 
     // Método para actualizar los textos de resultados en la interfaz gráfica
-    private void actualizarTextos() {
+    /*private void actualizarTextos() {
         try {
             char[] combinedArray = generator.combineArrays();
             String morseResult = convertToMorse(combinedArray);
@@ -267,26 +267,21 @@ public class MainCliente extends JFrame implements ActionListener {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error al obtener el texto combinado del servidor: " + ex.getMessage());
         }
-    }
+    }*/
 
     private void handleExecutor() {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-        long startTime = System.nanoTime();
-
         executorService.submit(() -> {
-            try {
-                char[] combinedArray = generator.combineArrays();
-                String morseResult = LogicaExecutorService.traducirTextoConExecutorService(combinedArray, CodigoMorse);
-                SwingUtilities.invokeLater(() -> {
-                    texto_ResultadoExecutor.setText(morseResult);
-                    double executionTimeInMillis = (System.nanoTime() - startTime) / 1_000_000.0;
-                    TiempoExecutorField.setText(String.format("%.2f ms", executionTimeInMillis));
-                });
-            } catch (RemoteException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error al obtener el texto combinado del servidor: " + e.getMessage());
-            }
+            long startTime = System.nanoTime();
+            String morseResult = LogicaExecutorService.traducirTextoConExecutorService(combinedArray, CodigoMorse);
+            long endTime = System.nanoTime();
+
+            SwingUtilities.invokeLater(() -> {
+                texto_ResultadoExecutor.setText(morseResult);
+                double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+                TiempoExecutorField.setText(String.format("%.2f ms", executionTimeInMillis));
+            });
         });
 
         executorService.shutdown();
@@ -294,35 +289,40 @@ public class MainCliente extends JFrame implements ActionListener {
 
     private void handleMerge() {
         long startTime = System.nanoTime();
+
+        // Realizar Merge Sort y traducción simultáneamente
         LogicaMergeSort logicaMergeSort = new LogicaMergeSort();
-        try {
-            char[] combinedArray = generator.combineArrays();
-            logicaMergeSort.mergeSort(combinedArray, 0, combinedArray.length - 1);
-            long endTime = System.nanoTime();
+        logicaMergeSort.mergeSortAndTranslate(combinedArray, 0, combinedArray.length - 1, CodigoMorse);
 
-            double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
-            TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
+        // Calcular tiempo de ejecución total
+        long endTime = System.nanoTime();
+        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+        TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
 
-            String morseResult = convertToMorse(combinedArray);
-            texto_ResultadoMergAreae.setText(morseResult);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al obtener el texto combinado del servidor: " + e.getMessage());
-        }
+        // Mostrar el resultado traducido en la interfaz de usuario
+        String morseResult = new String(combinedArray); // Suponiendo que el arreglo combinado ahora está en Morse
+        texto_ResultadoMergAreae.setText(morseResult);
     }
 
     private void handleForkJoin() {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
-        LogicaForkJoin mergeSortTask = new LogicaForkJoin(combinedArray, 0, combinedArray.length - 1);
 
+        // Iniciar el Fork/Join Task y traducción simultáneamente
+        LogicaForkJoin mergeSortTask = new LogicaForkJoin(combinedArray, 0, combinedArray.length - 1, CodigoMorse);
+
+        // Calcular tiempo de inicio
         long startTime = System.nanoTime();
-        forkJoinPool.invoke(mergeSortTask);
-        long endTime = System.nanoTime();
 
+        // Ejecutar el Fork/Join Task
+        forkJoinPool.invoke(mergeSortTask);
+
+        // Calcular tiempo de fin
+        long endTime = System.nanoTime();
         double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
         TiempoForkField.setText(String.format("%.2f ms", executionTimeInMillis));
 
-        String morseResult = convertToMorse(combinedArray);
+        // Mostrar el resultado traducido en la interfaz de usuario
+        String morseResult = new String(combinedArray); // Suponiendo que el arreglo combinado ahora está en Morse
         texto_ResultadoFork.setText(morseResult);
     }
 

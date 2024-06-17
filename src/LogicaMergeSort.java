@@ -1,39 +1,29 @@
+import java.util.HashMap;
+
 public class LogicaMergeSort {
-     public void mergeSort(char[] array, int left, int right) {
-        if (left < right) {
-            int mid = left + (right - left) / 2;
-            mergeSort(array, left, mid);
-            mergeSort(array, mid + 1, right);
-            merge(array, left, mid, right);
+
+    public void mergeSortAndTranslate(char[] arr, int l, int r, HashMap<Character, String> codigoMorse) {
+        if (l < r) {
+            int m = l + (r - l) / 2;
+
+            mergeSortAndTranslate(arr, l, m, codigoMorse);
+            mergeSortAndTranslate(arr, m + 1, r, codigoMorse);
+
+            merge(arr, l, m, r, codigoMorse);
         }
     }
-    public void justChecking(char[] array){
-        char[] temp = array;
-        if (temp.length >= 50000){
-            try {
-                Thread.sleep(40);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+
+    private void merge(char[] arr, int l, int m, int r, HashMap<Character, String> codigoMorse) {
+        // Realizar el merge sort
+        // Aquí implementa la lógica del merge sort
+        // ...
+
+        // Traducir a código Morse
+        for (int i = l; i <= r; i++) {
+            char c = arr[i];
+            if (codigoMorse.containsKey(c)) {
+                arr[i] = codigoMorse.get(c).charAt(0); // Suponiendo que solo tomamos el primer carácter de Morse
             }
         }
-        else{
-            String bandera = "Todo Okey";
-        }
     }
-
-    private void merge(char[] array, int left, int mid, int right) {
-        char[] temp = new char[right - left + 1];
-        int i = left, j = mid + 1, k = 0;
-
-        while (i <= mid) {
-            temp[k++] = array[i++];
-        }
-
-        while (j <= right) {
-            temp[k++] = array[j++];
-        }
-
-        System.arraycopy(temp, 0, array, left, temp.length);
-    }
-    
 }

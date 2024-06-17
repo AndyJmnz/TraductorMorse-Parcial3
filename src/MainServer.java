@@ -16,7 +16,6 @@ import java.rmi.registry.LocateRegistry;
 public class MainServer extends JFrame {
     JButton limpiarListaButton;
     ImplementacionTraductor generator;
-    JTextArea textArea;
 
     public MainServer() {
         setTitle("Traductor Server");
@@ -36,7 +35,7 @@ public class MainServer extends JFrame {
                 try {
                     generator.clearData();
                     System.out.println("Lista limpiada.");
-                    actualizarTextArea(); // Actualiza el contenido del JTextArea
+                    //actualizarTextArea(); // Actualiza el contenido del JTextArea
                 } catch (RemoteException ex) {
                     ex.printStackTrace();
                 }
@@ -47,12 +46,7 @@ public class MainServer extends JFrame {
         limpiarListaButton.setBackground(new Color(0, 166, 75));
         limpiarListaButton.setForeground(Color.WHITE);
 
-        // JTextArea para mostrar texto combinado
-        textArea = new JTextArea();
-        textArea.setEditable(false); // Para que no sea editable por el usuario
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setBounds(50, 50, 300, 120);
-        add(scrollPane);
+
 
         try {
             // Crea el registro RMI en el puerto 1099
@@ -74,7 +68,7 @@ public class MainServer extends JFrame {
     }
 
     // Método para actualizar el contenido del JTextArea con el texto combinado
-    private void actualizarTextArea() {
+    /*private void actualizarTextArea() {
         try {
             char[] combinedData = generator.combineArrays();
             String combinedText = new String(combinedData);
@@ -82,7 +76,7 @@ public class MainServer extends JFrame {
         } catch (RemoteException ex) {
             ex.printStackTrace();
         }
-    }
+    }*/
 
     public static void main(String[] args) {
         new MainServer();
