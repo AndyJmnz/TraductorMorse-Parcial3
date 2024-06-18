@@ -20,7 +20,7 @@ public class LogicaForkJoin extends RecursiveAction {
     @Override
     protected void compute() {
         if (r - l <= THRESHOLD) {
-            // Realizar ordenamiento y traducción secuencialmente
+            // Realizar ordenamiento secuencial y traducción al mismo tiempo
             mergeSortAndTranslate(array, l, r);
         } else {
             // Dividir el trabajo en dos sub-tareas
@@ -34,6 +34,8 @@ public class LogicaForkJoin extends RecursiveAction {
 
             // Esperar a que las sub-tareas completen
             leftTask.join();
+            // Combinar resultados (merge) después de que las sub-tareas hayan completado
+            merge(array, l, m, r);
         }
     }
 
@@ -80,16 +82,6 @@ public class LogicaForkJoin extends RecursiveAction {
             array[k] = R[j];
             j++;
             k++;
-        }
-
-        translateArray(array, l, r);
-    }
-
-    private void translateArray(char[] array, int l, int r) {
-        for (int i = l; i <= r; i++) {
-            if (codigoMorse.containsKey(array[i])) {
-                array[i] = codigoMorse.get(array[i]).charAt(0); // Traducción a Morse simplificada
-            }
         }
     }
 }

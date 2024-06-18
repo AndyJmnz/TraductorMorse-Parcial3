@@ -14,6 +14,7 @@ public class LogicaMergeSort {
             mergeSortAndTranslate(array, l, m);
             mergeSortAndTranslate(array, m + 1, r);
             merge(array, l, m, r);
+            translateArray(array, l, r); // Traducir solo después de que el arreglo esté ordenado
         }
     }
 
@@ -52,8 +53,6 @@ public class LogicaMergeSort {
             j++;
             k++;
         }
-
-        translateArray(array, l, r);
     }
 
     private void translateArray(char[] array, int l, int r) {

@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.Naming;
-import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -87,7 +86,6 @@ public class MainCliente extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
 
-        // Colores de fondo y fuente personalizada
         getContentPane().setBackground(new Color(222, 255, 245));
         Font labelFont = new Font("Arial", Font.BOLD, 14);
 
@@ -212,6 +210,9 @@ public class MainCliente extends JFrame implements ActionListener {
 
         combinarButton.setBackground(new Color(249, 65, 68));
         combinarButton.setForeground(Color.WHITE);
+
+        enviarButton.setBackground(new Color(249, 65, 68));
+        enviarButton.setForeground(Color.WHITE);
     }
 
     public static void main(String[] args) {
@@ -269,24 +270,18 @@ public class MainCliente extends JFrame implements ActionListener {
     }
 
     private void handleMerge() {
-        // Crear una copia del arreglo combinado
         char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
 
-        // Crear una instancia de LogicaMergeSort con el código Morse
         LogicaMergeSort logicaMergeSort = new LogicaMergeSort(CodigoMorse);
 
-        // Medir el tiempo de inicio
         long startTime = System.nanoTime();
 
-        // Realizar Merge Sort y traducción simultáneamente en la copia del arreglo
         logicaMergeSort.mergeSortAndTranslate(copyArray, 0, copyArray.length - 1);
 
-        // Medir el tiempo de fin
         long endTime = System.nanoTime();
         double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
 
-        // Mostrar el resultado traducido en el JTextArea correspondiente
-        String morseResult = new String(copyArray); // Suponiendo que el arreglo combinado ahora está en Morse
+        String morseResult = new String(copyArray);
         SwingUtilities.invokeLater(() -> {
             texto_ResultadoMergAreae.setText(morseResult);
             TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
@@ -294,26 +289,20 @@ public class MainCliente extends JFrame implements ActionListener {
     }
 
     private void handleForkJoin() {
-        // Crear una copia del arreglo combinado
         char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
 
         ForkJoinPool forkJoinPool = new ForkJoinPool();
 
-        // Crear una instancia de LogicaForkJoin con el código Morse
         LogicaForkJoin mergeSortTask = new LogicaForkJoin(copyArray, 0, copyArray.length - 1, CodigoMorse);
 
-        // Medir el tiempo de inicio
         long startTime = System.nanoTime();
 
-        // Ejecutar el Fork/Join Task
         forkJoinPool.invoke(mergeSortTask);
 
-        // Medir el tiempo de fin
         long endTime = System.nanoTime();
         double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
 
-        // Mostrar el resultado traducido en el JTextArea correspondiente
-        String morseResult = new String(copyArray); // Suponiendo que el arreglo combinado ahora está en Morse
+        String morseResult = new String(copyArray);
         SwingUtilities.invokeLater(() -> {
             texto_ResultadoFork.setText(morseResult);
             TiempoForkField.setText(String.format("%.2f ms", executionTimeInMillis));
@@ -323,7 +312,6 @@ public class MainCliente extends JFrame implements ActionListener {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         executorService.submit(() -> {
-            // Crear una copia del arreglo combinado
             char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
 
             long startTime = System.nanoTime();
