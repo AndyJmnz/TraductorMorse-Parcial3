@@ -14,7 +14,7 @@ public class MainCliente extends JFrame implements ActionListener {
     JLabel ingresarJLabel, resultado1JLabel, resultado2JLabel, resultado3JLabel, tiempo1JLabel, tiempo2JLabel, tiempo3JLabel;
     JTextArea texto_Ingresado, texto_ResultadoMergAreae, texto_ResultadoFork, texto_ResultadoExecutor;
     JTextField TiempoMergeField, TiempoForkField, TiempoExecutorField;
-    JButton JbuttonMerge, JbuttonForkJoin, JbuttonExecutor, limpiarButton, combinarButton;
+    JButton JbuttonMerge, JbuttonForkJoin, JbuttonExecutor, limpiarButton, combinarButton, enviarButton;
     private static final HashMap<Character, String> CodigoMorse = new HashMap<>();
 
     char[] combinedArray;
@@ -167,7 +167,12 @@ public class MainCliente extends JFrame implements ActionListener {
         TiempoExecutorField.setEditable(false);
         add(TiempoExecutorField);
 
-        combinarButton = new JButton("Enviar");
+        enviarButton = new JButton("Enviar");
+        enviarButton.setBounds(50, 530, 100, 25);
+        enviarButton.addActionListener(this);
+        add(enviarButton);
+
+        combinarButton = new JButton("Combinar");
         combinarButton.setBounds(200, 530, 100, 25);
         combinarButton.addActionListener(this);
         add(combinarButton);
@@ -215,17 +220,23 @@ public class MainCliente extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == combinarButton) {
+        if (e.getSource() == enviarButton) {
             try {
                 generator = (InterfazTraductor) Naming.lookup(url);
                 String inputText = texto_Ingresado.getText();
                 generator.addArray(inputText.toCharArray());
-                combinedArray = generator.combineArrays();
-                //actualizarTextos();
-                JOptionPane.showMessageDialog(this, "Texto enviado y combinado recibido del servidor.");
+                JOptionPane.showMessageDialog(this, "Texto enviado al servidor.");
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error al enviar texto al servidor: " + ex.getMessage());
+            }
+        } else if (e.getSource() == combinarButton) {
+            try {
+                combinedArray = generator.combineArrays();
+                JOptionPane.showMessageDialog(this, "Texto combinado recibido del servidor.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al combinar texto del servidor: " + ex.getMessage());
             }
         } else if (e.getSource() == limpiarButton) {
             texto_Ingresado.setText("");
@@ -256,20 +267,6 @@ public class MainCliente extends JFrame implements ActionListener {
         }
     }
 
-    // Método para actualizar los textos de resultados en la interfaz gráfica
-    /*private void actualizarTextos() {
-        try {
-            char[] combinedArray = generator.combineArrays();
-            String morseResult = convertToMorse(combinedArray);
-            texto_ResultadoMergAreae.setText(morseResult);
-            texto_ResultadoFork.setText(morseResult);
-            texto_ResultadoExecutor.setText(morseResult);
-        } catch (RemoteException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al obtener el texto combinado del servidor: " + ex.getMessage());
-        }
-    }*/
-
     private void handleExecutor() {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
@@ -291,9 +288,11 @@ public class MainCliente extends JFrame implements ActionListener {
     private void handleMerge() {
         long startTime = System.nanoTime();
 
+        // Crear una instancia de LogicaMergeSort con el código Morse
+        LogicaMergeSort logicaMergeSort = new LogicaMergeSort(CodigoMorse);
+
         // Realizar Merge Sort y traducción simultáneamente
-        LogicaMergeSort logicaMergeSort = new LogicaMergeSort();
-        logicaMergeSort.mergeSortAndTranslate(combinedArray, 0, combinedArray.length - 1, CodigoMorse);
+        logicaMergeSort.mergeSortAndTranslate(combinedArray, 0, combinedArray.length - 1);
 
         // Calcular tiempo de ejecución total
         long endTime = System.nanoTime();
@@ -308,7 +307,7 @@ public class MainCliente extends JFrame implements ActionListener {
     private void handleForkJoin() {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
 
-        // Iniciar el Fork/Join Task y traducción simultáneamente
+        // Crear una instancia de LogicaForkJoin con el código Morse
         LogicaForkJoin mergeSortTask = new LogicaForkJoin(combinedArray, 0, combinedArray.length - 1, CodigoMorse);
 
         // Calcular tiempo de inicio

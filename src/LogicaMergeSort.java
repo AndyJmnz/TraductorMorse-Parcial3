@@ -2,27 +2,64 @@ import java.util.HashMap;
 
 public class LogicaMergeSort {
 
-    public void mergeSortAndTranslate(char[] arr, int l, int r, HashMap<Character, String> codigoMorse) {
+    private HashMap<Character, String> codigoMorse;
+
+    public LogicaMergeSort(HashMap<Character, String> codigoMorse) {
+        this.codigoMorse = codigoMorse;
+    }
+
+    public void mergeSortAndTranslate(char[] array, int l, int r) {
         if (l < r) {
             int m = l + (r - l) / 2;
-
-            mergeSortAndTranslate(arr, l, m, codigoMorse);
-            mergeSortAndTranslate(arr, m + 1, r, codigoMorse);
-
-            merge(arr, l, m, r, codigoMorse);
+            mergeSortAndTranslate(array, l, m);
+            mergeSortAndTranslate(array, m + 1, r);
+            merge(array, l, m, r);
         }
     }
 
-    private void merge(char[] arr, int l, int m, int r, HashMap<Character, String> codigoMorse) {
-        // Realizar el merge sort
-        // Aquí implementa la lógica del merge sort
-        // ...
+    private void merge(char[] array, int l, int m, int r) {
+        int n1 = m - l + 1;
+        int n2 = r - m;
 
-        // Traducir a código Morse
+        char[] L = new char[n1];
+        char[] R = new char[n2];
+
+        System.arraycopy(array, l, L, 0, n1);
+        System.arraycopy(array, m + 1, R, 0, n2);
+
+        int i = 0, j = 0;
+        int k = l;
+
+        while (i < n1 && j < n2) {
+            if (L[i] <= R[j]) {
+                array[k] = L[i];
+                i++;
+            } else {
+                array[k] = R[j];
+                j++;
+            }
+            k++;
+        }
+
+        while (i < n1) {
+            array[k] = L[i];
+            i++;
+            k++;
+        }
+
+        while (j < n2) {
+            array[k] = R[j];
+            j++;
+            k++;
+        }
+
+        translateArray(array, l, r);
+    }
+
+    private void translateArray(char[] array, int l, int r) {
         for (int i = l; i <= r; i++) {
-            char c = arr[i];
-            if (codigoMorse.containsKey(c)) {
-                arr[i] = codigoMorse.get(c).charAt(0); // Suponiendo que solo tomamos el primer carácter de Morse
+            if (codigoMorse.containsKey(array[i])) {
+                array[i] = codigoMorse.get(array[i]).charAt(0); // Traducción a Morse simplificada
             }
         }
     }
