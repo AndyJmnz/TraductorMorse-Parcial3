@@ -268,21 +268,32 @@ public class MainCliente extends JFrame implements ActionListener {
         }
     }
 
-    private String handleMerge() {
+    private void handleMerge() {
         // Crear una copia del arreglo combinado
         char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
 
         // Crear una instancia de LogicaMergeSort con el código Morse
         LogicaMergeSort logicaMergeSort = new LogicaMergeSort(CodigoMorse);
 
+        // Medir el tiempo de inicio
+        long startTime = System.nanoTime();
+
         // Realizar Merge Sort y traducción simultáneamente en la copia del arreglo
         logicaMergeSort.mergeSortAndTranslate(copyArray, 0, copyArray.length - 1);
 
-        // Devolver el resultado traducido
-        return new String(copyArray);
+        // Medir el tiempo de fin
+        long endTime = System.nanoTime();
+        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+
+        // Mostrar el resultado traducido en el JTextArea correspondiente
+        String morseResult = new String(copyArray); // Suponiendo que el arreglo combinado ahora está en Morse
+        SwingUtilities.invokeLater(() -> {
+            texto_ResultadoMergAreae.setText(morseResult);
+            TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
+        });
     }
 
-    private String handleForkJoin() {
+    private void handleForkJoin() {
         // Crear una copia del arreglo combinado
         char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
 
@@ -291,13 +302,23 @@ public class MainCliente extends JFrame implements ActionListener {
         // Crear una instancia de LogicaForkJoin con el código Morse
         LogicaForkJoin mergeSortTask = new LogicaForkJoin(copyArray, 0, copyArray.length - 1, CodigoMorse);
 
+        // Medir el tiempo de inicio
+        long startTime = System.nanoTime();
+
         // Ejecutar el Fork/Join Task
         forkJoinPool.invoke(mergeSortTask);
 
-        // Devolver el resultado traducido
-        return new String(copyArray);
-    }
+        // Medir el tiempo de fin
+        long endTime = System.nanoTime();
+        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
 
+        // Mostrar el resultado traducido en el JTextArea correspondiente
+        String morseResult = new String(copyArray); // Suponiendo que el arreglo combinado ahora está en Morse
+        SwingUtilities.invokeLater(() -> {
+            texto_ResultadoFork.setText(morseResult);
+            TiempoForkField.setText(String.format("%.2f ms", executionTimeInMillis));
+        });
+    }
     private void handleExecutor() {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
