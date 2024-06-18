@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.RecursiveAction;
 
@@ -36,6 +37,8 @@ public class LogicaForkJoin extends RecursiveAction {
             leftTask.join();
             // Combinar resultados (merge) después de que las sub-tareas hayan completado
             merge(array, l, m, r);
+            // Traducir después de que todo esté ordenado
+            translateArray(array, l, r);
         }
     }
 
@@ -84,4 +87,22 @@ public class LogicaForkJoin extends RecursiveAction {
             k++;
         }
     }
+
+    private void translateArray(char[] array, int l, int r) {
+        // Crear una copia del segmento a traducir
+        char[] segment = Arrays.copyOfRange(array, l, r + 1);
+
+        // Traducir cada carácter del segmento según el código Morse
+        for (int i = 0; i < segment.length; i++) {
+            char originalChar = segment[i];
+            if (codigoMorse.containsKey(originalChar)) {
+                // Obtener el código Morse correspondiente
+                String morseCode = codigoMorse.get(originalChar);
+                // Reemplazar en el arreglo original
+                array[l + i] = morseCode.charAt(0); // Suponemos que el primer carácter del código Morse es suficiente
+            }
+        }
+    }
 }
+
+

@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class LogicaMergeSort {
@@ -56,9 +57,17 @@ public class LogicaMergeSort {
     }
 
     private void translateArray(char[] array, int l, int r) {
-        for (int i = l; i <= r; i++) {
-            if (codigoMorse.containsKey(array[i])) {
-                array[i] = codigoMorse.get(array[i]).charAt(0); // Traducción a Morse simplificada
+        // Crear una copia del segmento a traducir
+        char[] segment = Arrays.copyOfRange(array, l, r + 1);
+
+        // Traducir cada carácter del segmento según el código Morse
+        for (int i = 0; i < segment.length; i++) {
+            char originalChar = segment[i];
+            if (codigoMorse.containsKey(originalChar)) {
+                // Obtener el código Morse correspondiente
+                String morseCode = codigoMorse.get(originalChar);
+                // Reemplazar en el arreglo original
+                array[l + i] = morseCode.charAt(0); // Suponemos que el primer carácter del código Morse es suficiente
             }
         }
     }
