@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -267,12 +268,45 @@ public class MainCliente extends JFrame implements ActionListener {
         }
     }
 
+    private String handleMerge() {
+        // Crear una copia del arreglo combinado
+        char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
+
+        // Crear una instancia de LogicaMergeSort con el código Morse
+        LogicaMergeSort logicaMergeSort = new LogicaMergeSort(CodigoMorse);
+
+        // Realizar Merge Sort y traducción simultáneamente en la copia del arreglo
+        logicaMergeSort.mergeSortAndTranslate(copyArray, 0, copyArray.length - 1);
+
+        // Devolver el resultado traducido
+        return new String(copyArray);
+    }
+
+    private String handleForkJoin() {
+        // Crear una copia del arreglo combinado
+        char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
+
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+
+        // Crear una instancia de LogicaForkJoin con el código Morse
+        LogicaForkJoin mergeSortTask = new LogicaForkJoin(copyArray, 0, copyArray.length - 1, CodigoMorse);
+
+        // Ejecutar el Fork/Join Task
+        forkJoinPool.invoke(mergeSortTask);
+
+        // Devolver el resultado traducido
+        return new String(copyArray);
+    }
+
     private void handleExecutor() {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         executorService.submit(() -> {
+            // Crear una copia del arreglo combinado
+            char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
+
             long startTime = System.nanoTime();
-            String morseResult = LogicaExecutorService.traducirTextoConExecutorService(combinedArray, CodigoMorse);
+            String morseResult = LogicaExecutorService.traducirTextoConExecutorService(copyArray, CodigoMorse);
             long endTime = System.nanoTime();
 
             SwingUtilities.invokeLater(() -> {
@@ -284,47 +318,4 @@ public class MainCliente extends JFrame implements ActionListener {
 
         executorService.shutdown();
     }
-
-    private void handleMerge() {
-        long startTime = System.nanoTime();
-
-        // Crear una instancia de LogicaMergeSort con el código Morse
-        LogicaMergeSort logicaMergeSort = new LogicaMergeSort(CodigoMorse);
-
-        // Realizar Merge Sort y traducción simultáneamente
-        logicaMergeSort.mergeSortAndTranslate(combinedArray, 0, combinedArray.length - 1);
-
-        // Calcular tiempo de ejecución total
-        long endTime = System.nanoTime();
-        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
-        TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
-
-        // Mostrar el resultado traducido en la interfaz de usuario
-        String morseResult = new String(combinedArray); // Suponiendo que el arreglo combinado ahora está en Morse
-        texto_ResultadoMergAreae.setText(morseResult);
-    }
-
-    private void handleForkJoin() {
-        ForkJoinPool forkJoinPool = new ForkJoinPool();
-
-        // Crear una instancia de LogicaForkJoin con el código Morse
-        LogicaForkJoin mergeSortTask = new LogicaForkJoin(combinedArray, 0, combinedArray.length - 1, CodigoMorse);
-
-        // Calcular tiempo de inicio
-        long startTime = System.nanoTime();
-
-        // Ejecutar el Fork/Join Task
-        forkJoinPool.invoke(mergeSortTask);
-
-        // Calcular tiempo de fin
-        long endTime = System.nanoTime();
-        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
-        TiempoForkField.setText(String.format("%.2f ms", executionTimeInMillis));
-
-        // Mostrar el resultado traducido en la interfaz de usuario
-        String morseResult = new String(combinedArray); // Suponiendo que el arreglo combinado ahora está en Morse
-        texto_ResultadoFork.setText(morseResult);
-    }
-
-
 }
