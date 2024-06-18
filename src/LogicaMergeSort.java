@@ -1,3 +1,7 @@
+
+
+
+
 public class LogicaMergeSort {
     public void mergeSort(char[] array, int left, int right) {
         if (left < right) {
@@ -7,19 +11,8 @@ public class LogicaMergeSort {
             merge(array, left, mid, right);
         }
     }
-    public void justChecking(char[] array){
-        char[] temp = array;
-        if (temp.length >= 50000){
-            try {
-                Thread.sleep(40);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        else{
-            String bandera = "Todo Okey";
-        }
-    }
+
+
 
     private void merge(char[] array, int left, int mid, int right) {
         char[] temp = new char[right - left + 1];
@@ -34,6 +27,19 @@ public class LogicaMergeSort {
         }
 
         System.arraycopy(temp, 0, array, left, temp.length);
+    }
+
+
+
+
+    public void Time(char[] array){
+        if (array.length >= 5000){
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

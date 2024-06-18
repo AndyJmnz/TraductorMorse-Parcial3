@@ -275,7 +275,7 @@ public class MainCliente extends JFrame implements ActionListener {
 
         long startTime = System.nanoTime();
         logicaMergeSort.mergeSort(copyArray, 0, copyArray.length - 1);
-        logicaMergeSort.justChecking(copyArray);
+        logicaMergeSort.Time(copyArray);
         long endTime = System.nanoTime();
 
         double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
