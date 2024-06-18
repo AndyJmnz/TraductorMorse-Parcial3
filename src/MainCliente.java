@@ -86,7 +86,6 @@ public class MainCliente extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
 
-        // Colores de fondo y fuente personalizada
         getContentPane().setBackground(new Color(222, 255, 245));
         Font labelFont = new Font("Arial", Font.BOLD, 14);
 
