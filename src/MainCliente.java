@@ -220,6 +220,7 @@ public class MainCliente extends JFrame implements ActionListener {
                 generator = (InterfazTraductor) Naming.lookup(url);
                 String inputText = texto_Ingresado.getText();
                 generator.addArray(inputText.toCharArray());
+                combinedArray = generator.combineArrays();
                 //actualizarTextos();
                 JOptionPane.showMessageDialog(this, "Texto enviado y combinado recibido del servidor.");
             } catch (Exception ex) {
