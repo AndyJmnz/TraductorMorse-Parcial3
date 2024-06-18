@@ -324,7 +324,7 @@ public class MainCliente extends JFrame implements ActionListener {
 
             long startTime = System.nanoTime();
             String morseResult = LogicaExecutorService.traducirTextoConExecutorService(copyArray, CodigoMorse);
-            LogicaExecutorService.Time(combinedArray);
+            //LogicaExecutorService.Time(combinedArray);
             long endTime = System.nanoTime();
 
             SwingUtilities.invokeLater(() -> {
