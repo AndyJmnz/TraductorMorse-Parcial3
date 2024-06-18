@@ -326,15 +326,5 @@ public class MainCliente extends JFrame implements ActionListener {
         texto_ResultadoFork.setText(morseResult);
     }
 
-    private String convertToMorse(char[] charArray) {
-        StringBuilder morseCode = new StringBuilder();
-        for (char c : charArray) {
-            if (CodigoMorse.containsKey(c)) {
-                morseCode.append(CodigoMorse.get(c)).append(" ");
-            } else {
-                morseCode.append(" ");
-            }
-        }
-        return morseCode.toString();
-    }
+
 }
