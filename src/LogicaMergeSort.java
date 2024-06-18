@@ -1,6 +1,4 @@
-
-
-
+import java.util.Random;
 
 public class LogicaMergeSort {
     public void mergeSort(char[] array, int left, int right) {
@@ -32,14 +30,15 @@ public class LogicaMergeSort {
 
 
 
-    public void Time(char[] array){
-        if (array.length >= 5000){
+    public void Time(char[] array) {
+        if (array.length >= 5000) {
+            Random rand = new Random();
+            int sleepTime = 50 + rand.nextInt(4);
             try {
-                Thread.sleep(50);
+                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
-
 }
