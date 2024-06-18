@@ -14,7 +14,7 @@ public class MainServer extends JFrame {
 
     public MainServer() {
         setTitle("Traductor Server");
-        setSize(400, 400);
+        setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
 
@@ -23,7 +23,7 @@ public class MainServer extends JFrame {
 
         // Botón para limpiar la lista
         limpiarListaButton = new JButton("Limpiar Lista");
-        limpiarListaButton.setBounds(225, 260, 125, 25);
+        limpiarListaButton.setBounds(225, 125, 125, 25);
         limpiarListaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -44,12 +44,12 @@ public class MainServer extends JFrame {
         textArea.setBounds(50, 50, 300, 200);
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setBounds(50, 50, 300, 200);
+        scrollPane.setBounds(50, 50, 300, 50);
         add(scrollPane);
 
         // Botón para mostrar el combinedArray
         mostrarCombinedButton = new JButton("Mostrar");
-        mostrarCombinedButton.setBounds(50, 260, 125, 25);
+        mostrarCombinedButton.setBounds(50, 125, 125, 25);
         mostrarCombinedButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
