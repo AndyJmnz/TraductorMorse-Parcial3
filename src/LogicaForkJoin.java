@@ -1,108 +1,71 @@
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.RecursiveAction;
 
 public class LogicaForkJoin extends RecursiveAction {
 
     private static final int THRESHOLD = 10;
-
     private char[] array;
-    private int l;
-    private int r;
-    private HashMap<Character, String> codigoMorse;
+    private int left;
+    private int right;
+    private HashMap<Character, String> CodigoMorse;
 
-    public LogicaForkJoin(char[] array, int l, int r, HashMap<Character, String> codigoMorse) {
+    public LogicaForkJoin(char[] array, int left, int right, HashMap<Character, String> CodigoMorse) {
         this.array = array;
-        this.l = l;
-        this.r = r;
-        this.codigoMorse = codigoMorse;
+        this.left = left;
+        this.right = right;
+        this.CodigoMorse = CodigoMorse;
     }
 
     @Override
     protected void compute() {
-        if (r - l <= THRESHOLD) {
-            // Realizar ordenamiento secuencial y traducción al mismo tiempo
-            mergeSortAndTranslate(array, l, r);
-        } else {
-            // Dividir el trabajo en dos sub-tareas
-            int m = l + (r - l) / 2;
-            LogicaForkJoin leftTask = new LogicaForkJoin(array, l, m, codigoMorse);
-            LogicaForkJoin rightTask = new LogicaForkJoin(array, m + 1, r, codigoMorse);
+        if (left < right) {
+            int mid = left + (right - left) / 2;
 
-            // Invocar sub-tareas de manera asíncrona
-            leftTask.fork();
-            rightTask.compute();
+            LogicaForkJoin leftTask = new LogicaForkJoin(array, left, mid, CodigoMorse);
+            LogicaForkJoin rightTask = new LogicaForkJoin(array, mid + 1, right, CodigoMorse);
 
-            // Esperar a que las sub-tareas completen
-            leftTask.join();
-            // Combinar resultados (merge) después de que las sub-tareas hayan completado
-            merge(array, l, m, r);
-            // Traducir después de que todo esté ordenado
-            translateArray(array, l, r);
+            invokeAll(leftTask, rightTask);
+
+            merge(array, left, mid, right);
         }
     }
 
-    private void mergeSortAndTranslate(char[] array, int l, int r) {
-        if (l < r) {
-            int m = l + (r - l) / 2;
-            mergeSortAndTranslate(array, l, m);
-            mergeSortAndTranslate(array, m + 1, r);
-            merge(array, l, m, r);
-        }
-    }
+    private void merge(char[] array, int left, int mid, int right) {
+        char[] temp = new char[right - left + 1];
+        int i = left, j = mid + 1, k = 0;
 
-    private void merge(char[] array, int l, int m, int r) {
-        int n1 = m - l + 1;
-        int n2 = r - m;
-
-        char[] L = new char[n1];
-        char[] R = new char[n2];
-
-        System.arraycopy(array, l, L, 0, n1);
-        System.arraycopy(array, m + 1, R, 0, n2);
-
-        int i = 0, j = 0;
-        int k = l;
-
-        while (i < n1 && j < n2) {
-            if (L[i] <= R[j]) {
-                array[k] = L[i];
-                i++;
+        while (i <= mid && j <= right) {
+            if (array[i] <= array[j]) {
+                temp[k++] = array[i++];
             } else {
-                array[k] = R[j];
-                j++;
+                temp[k++] = array[j++];
             }
-            k++;
         }
 
-        while (i < n1) {
-            array[k] = L[i];
-            i++;
-            k++;
+        while (i <= mid) {
+            temp[k++] = array[i++];
         }
 
-        while (j < n2) {
-            array[k] = R[j];
-            j++;
-            k++;
+        while (j <= right) {
+            temp[k++] = array[j++];
+        }
+
+        System.arraycopy(temp, 0, array, left, temp.length);
+    }
+
+    public void translateArray() {
+        translateRange(array, left, right);
+    }
+
+    private void translateRange(char[] array, int left, int right) {
+        for (int i = left; i <= right; i++) {
+            if (CodigoMorse.containsKey(array[i])) {
+                array[i] = CodigoMorse.get(array[i]).charAt(0); // Traducción a Morse simplificada
+            }
         }
     }
 
-    private void translateArray(char[] array, int l, int r) {
-        // Crear una copia del segmento a traducir
-        char[] segment = Arrays.copyOfRange(array, l, r + 1);
-
-        // Traducir cada carácter del segmento según el código Morse
-        for (int i = 0; i < segment.length; i++) {
-            char originalChar = segment[i];
-            if (codigoMorse.containsKey(originalChar)) {
-                // Obtener el código Morse correspondiente
-                String morseCode = codigoMorse.get(originalChar);
-                // Reemplazar en el arreglo original
-                array[l + i] = morseCode.charAt(0); // Suponemos que el primer carácter del código Morse es suficiente
-            }
-        }
+    public char[] getTranslatedArrayCopy() {
+        return array.clone(); // Devuelve una copia del arreglo traducido
     }
 }
-
-
