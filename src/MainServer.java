@@ -5,13 +5,6 @@ import java.awt.event.ActionListener;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.rmi.Naming;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 
 public class MainServer extends JFrame {
     JButton limpiarListaButton;
@@ -27,7 +20,6 @@ public class MainServer extends JFrame {
         getContentPane().setBackground(new Color(244, 132, 0));
         Font labelFont = new Font("Arial", Font.BOLD, 14);
 
-        // Botón para limpiar lista
         limpiarListaButton = new JButton("Limpiar Lista");
         limpiarListaButton.setBounds(100, 200, 150, 25);
         limpiarListaButton.addActionListener(new ActionListener() {
@@ -36,7 +28,7 @@ public class MainServer extends JFrame {
                 try {
                     generator.clearData();
                     System.out.println("Lista limpiada.");
-                    actualizarTextArea(); // Actualiza el contenido del JTextArea
+                    actualizarTextArea();
                 } catch (RemoteException ex) {
                     ex.printStackTrace();
                 }
@@ -50,13 +42,10 @@ public class MainServer extends JFrame {
 
 
         try {
-            // Crea el registro RMI en el puerto 1099
             LocateRegistry.createRegistry(1099);
 
-            // Crea la implementación del traductor
-            generator = new ImplementacionTraductor(2); // Cambia 2 por el número total de clientes esperado
+            generator = new ImplementacionTraductor(2);
 
-            // Registra el objeto remoto con el nombre especificado
             Naming.rebind("//192.168.0.2/TraductorMorse", generator);
 
             System.out.println("Servidor RMI está listo.");
@@ -68,7 +57,6 @@ public class MainServer extends JFrame {
         setVisible(true);
     }
 
-    // Método para actualizar el contenido del JTextArea con el texto combinado
     private void actualizarTextArea() {
         try {
             char[] combinedData = generator.combineArrays();

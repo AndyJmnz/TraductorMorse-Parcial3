@@ -10,8 +10,4 @@ public interface InterfazTraductor extends Remote {
 
     void clearCombinedArrays() throws RemoteException;
 
-    //char[] enviarTexto(String texto) throws RemoteException;
-
-
-
 }
