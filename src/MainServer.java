@@ -29,8 +29,7 @@ public class MainServer extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     generator.clearData();
-                    System.out.println("Lista limpiada.");
-                    actualizarTextArea();
+                    textArea.setText("Lista Limpiada");
                 } catch (RemoteException ex) {
                     ex.printStackTrace();
                 }
@@ -54,7 +53,7 @@ public class MainServer extends JFrame {
         mostrarCombinedButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mostrarCombined();
+                mostrarTexto();
             }
         });
         add(mostrarCombinedButton);
@@ -63,13 +62,10 @@ public class MainServer extends JFrame {
         mostrarCombinedButton.setForeground(Color.WHITE);
 
         try {
-            // Crear registro RMI en el puerto 1099
             LocateRegistry.createRegistry(1099);
 
-            // Instanciar la implementación del traductor
             generator = new ImplementacionTraductor(2);
 
-            // Enlazar el objeto remoto al registro RMI
             Naming.rebind("//localhost/TraductorMorse", generator);
 
             System.out.println("Servidor RMI está listo.");
@@ -81,23 +77,11 @@ public class MainServer extends JFrame {
         setVisible(true);
     }
 
-    // Actualizar el contenido del JTextArea con el combinedArray
-    private void actualizarTextArea() {
+    private void mostrarTexto() {
         try {
             char[] combinedData = generator.combineArrays();
             String combinedText = new String(combinedData);
             textArea.setText(combinedText);
-        } catch (RemoteException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    // Mostrar el contenido del combinedArray
-    private void mostrarCombined() {
-        try {
-            char[] combinedData = generator.combineArrays();
-            String combinedText = new String(combinedData);
-            JOptionPane.showMessageDialog(this, combinedText, "Combined Array", JOptionPane.INFORMATION_MESSAGE);
         } catch (RemoteException ex) {
             ex.printStackTrace();
         }
