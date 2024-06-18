@@ -292,19 +292,25 @@ public class MainCliente extends JFrame implements ActionListener {
         char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
 
         ForkJoinPool forkJoinPool = new ForkJoinPool();
-        LogicaForkJoin mergeSortTask = new LogicaForkJoin(copyArray, 0, copyArray.length - 1, CodigoMorse);
+        LogicaForkJoin mergeSortTask = new LogicaForkJoin(copyArray, 0, copyArray.length - 1);
 
         long startTime = System.nanoTime();
         forkJoinPool.invoke(mergeSortTask);
-        mergeSortTask.translateArray(); // Realizar traducción después de la ordenación
         long endTime = System.nanoTime();
 
         double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
         TiempoForkField.setText(String.format("%.2f ms", executionTimeInMillis));
 
-        char[] translatedArray = mergeSortTask.getTranslatedArrayCopy(); // Obtener copia del arreglo traducido
+        StringBuilder morseCode = new StringBuilder();
+        for (char c : copyArray) {
+            if (CodigoMorse.containsKey(c)) {
+                morseCode.append(CodigoMorse.get(c)).append(" ");
+            } else if (c == ' ') {
+                morseCode.append(" ");
+            }
+        }
 
-        texto_ResultadoFork.setText(new String(translatedArray));
+        texto_ResultadoFork.setText(morseCode.toString());
     }
     private void handleExecutor() {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
