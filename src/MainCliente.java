@@ -278,7 +278,7 @@ public class MainCliente extends JFrame implements ActionListener {
         logicaMergeSort.Time(copyArray);
         long endTime = System.nanoTime();
 
-        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+        double executionTimeInMillis = (endTime - startTime) / 1_000_000_000.0;
         TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
 
         StringBuilder morseCode = new StringBuilder();
@@ -302,7 +302,7 @@ public class MainCliente extends JFrame implements ActionListener {
         forkJoinPool.invoke(mergeSortTask);
         long endTime = System.nanoTime();
 
-        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+        double executionTimeInMillis = (endTime - startTime) / 1_000_000_000.0;
         TiempoForkField.setText(String.format("%.2f ms", executionTimeInMillis));
 
         StringBuilder morseCode = new StringBuilder();
@@ -328,7 +328,7 @@ public class MainCliente extends JFrame implements ActionListener {
 
             SwingUtilities.invokeLater(() -> {
                 texto_ResultadoExecutor.setText(morseResult);
-                double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+                double executionTimeInMillis = (endTime - startTime) / 1_000_000_000.0;
                 TiempoExecutorField.setText(String.format("%.2f ms", executionTimeInMillis));
             });
         });
