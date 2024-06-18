@@ -271,21 +271,25 @@ public class MainCliente extends JFrame implements ActionListener {
 
     private void handleMerge() {
         char[] copyArray = Arrays.copyOf(combinedArray, combinedArray.length);
-
-        LogicaMergeSort logicaMergeSort = new LogicaMergeSort(CodigoMorse);
+        LogicaMergeSort logicaMergeSort = new LogicaMergeSort();
 
         long startTime = System.nanoTime();
-
-        logicaMergeSort.mergeSortAndTranslate(copyArray, 0, copyArray.length - 1);
-
+        logicaMergeSort.mergeSort(copyArray, 0, copyArray.length - 1);
+        logicaMergeSort.justChecking(copyArray);
         long endTime = System.nanoTime();
-        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
 
-        String morseResult = new String(copyArray);
-        SwingUtilities.invokeLater(() -> {
-            texto_ResultadoMergAreae.setText(morseResult);
-            TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
-        });
+        double executionTimeInMillis = (endTime - startTime) / 1_000_000.0;
+        TiempoMergeField.setText(String.format("%.2f ms", executionTimeInMillis));
+
+        StringBuilder morseCode = new StringBuilder();
+        for (char c : copyArray) {
+            if (CodigoMorse.containsKey(c)) {
+                morseCode.append(CodigoMorse.get(c)).append(" ");
+            } else {
+                morseCode.append(" ");
+            }
+        }
+        texto_ResultadoMergAreae.setText(morseCode.toString());
     }
 
     private void handleForkJoin() {
